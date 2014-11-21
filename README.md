@@ -1,3 +1,4 @@
+[![Code Climate](https://codeclimate.com/github/jcronk/convert_ibm390/badges/gpa.svg)](https://codeclimate.com/github/jcronk/convert_ibm390)
 # Convert::IBM390
 
 This is a partial port of the [Convert::IBM390](https://metacpan.org/pod/Convert::IBM390) Perl module by Geoffrey Rommel.  It includes a few extra functions meant for processing an ASCII version of a mainframe data dump, even though that's pretty easy to do.  It does not include the pack/unpackeb functions from the module, because I didn't need to implement them.  This is a port of the pure-Perl version of the module, not the C version.  Anyone who wants to add C or Java versions is welcome to do so.  
