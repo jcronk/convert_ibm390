@@ -5,9 +5,10 @@ require 'convert/ibm390/version'
 # @author Jeremy Cronk
 module Convert
 
-  class ConversionError < Exception ; end
 
   module IBM390
+
+    class ConversionError < Exception ; end
 
     AE_HEX_TABLE = '00010203372d2e2f1605150b0c0d0e0f101112133c3d322618193f271c1d1e1f'\
       '405a7f7b5b6c507d4d5d5c4e6b604b61f0f1f2f3f4f5f6f7f8f97a5e4c7e6e6f'\
@@ -76,7 +77,7 @@ module Convert
       sign = xdigits.pop # last character
       arabic = xdigits.join # rest of characters
       if arabic !~ /^\d+$/ || sign !~ /^[a-f]$/
-        raise ConversionError, "Invalid packed value '#{xdigits}'"
+        raise ConversionError, "Invalid packed value '#{xdigits.join('').upcase}'"
       end
       arabic = arabic.to_i
       arabic = 0 - arabic if sign =~ /[bd]/
@@ -102,8 +103,16 @@ module Convert
     # @return [Float] if implied decimals
     def zoned2num(zoned, ndec=0)
       sign = (zoned =~ /[\xD0-\xD9]/n ? -1 : 1)
-      zoned = eb2asc(zoned)
-      sign * asc_zoned2num(eb2asc(zoned), ndec)
+      asc_zoned = eb2asc(zoned)
+      sign * asc_zoned2num(asc_zoned, ndec)
+    rescue ConversionError => e
+      raise e, "Error converting EBCDIC string '#{zoned}' (#{zoned.size} chars) into number.  Hex of original string: #{hexify(zoned)}\n#{e.message}"
+    end
+
+    def hexify(string)
+      string.unpack("H*").first.split(//).each_slice(2).to_a.map do |chrs|
+        "#{chrs.join('')}"
+      end.join(' ')
     end
 
     def num2ascnum(num, ndec=0)
@@ -113,7 +122,7 @@ module Convert
 
     def asc_zoned2num(zoned, ndec=0)
       zoned = zoned.tr(' {ABCDEFGHI}JKLMNOPQR', '001234567890123456789').strip
-      raise ConversionError, "Invalid zoned value '#{zoned}'" unless zoned =~ /^\d+/
+      raise ConversionError, "Invalid zoned value '#{zoned}' (#{zoned.unpack('H*').map{|c| "x#{c}"}.join})" unless zoned =~ /^\d+/
       final = zoned.to_i
       add_decimals(final, ndec)
     end
