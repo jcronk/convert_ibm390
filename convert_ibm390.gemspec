@@ -1,15 +1,15 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'convert_ibm390/version'
+require 'convert/ibm390/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "convert_ibm390"
-  spec.version       = ConvertIbm390::VERSION
+  spec.version       = Convert::IBM390::VERSION
   spec.authors       = ["Jeremy Cronk"]
   spec.email         = ["jcronk@nxtechcorp.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{ Module methods for converting mainframe data }
+  spec.description   = %q{ Convert regular EBCDIC to ASCII, convert zoned and packed fields. }
   spec.homepage      = ""
   spec.license       = "MIT"
 
