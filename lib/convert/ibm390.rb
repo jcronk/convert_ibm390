@@ -115,6 +115,33 @@ module Convert
       end.join(' ')
     end
 
+    def hexdump(string, startad=0, charset='ascii')
+      range = 0..string.length
+      outlines = []
+      range.step(32) do |offset|
+        str = string[offset...offset + 32]
+        pri = if charset =~ /ebc/i
+                eb2ascp(str)
+              else
+                str.encode("UTF-8", invalid: :replace, replace: ' ').tr("\000-\037\377", ' ')
+              end
+        hexes = str.unpack("H64").first
+        hexes = hexes.tr('a-f','A-F')
+        if (string.length - offset) < 32
+          pri = [pri].pack("A32")
+          hexes = [hexes].pack("A64")
+        end
+        d = "%06X: " % (startad + offset)
+        (0..64).step(8) do |j|
+          d << hexes[j...j + 8] << ' '
+          d << ' ' if j == 24
+        end
+        d << " *#{pri}*\n"
+        outlines << d
+      end
+      outlines
+    end
+
     def num2ascnum(num, ndec=0)
       num = eb2asc(num).to_i
       add_decimals(num, ndec)
