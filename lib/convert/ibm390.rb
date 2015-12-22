@@ -142,10 +142,10 @@ module Convert
       outlines
     end
 
-    def unpackeb(template, record)
-      pointer_pos = 0
-      template_pos =
-    end
+    # def unpackeb(template, record)
+    #   pointer_pos = 0
+    #   template_pos =
+    # end
 
     def num2ascnum(num, ndec=0)
       num = eb2asc(num).to_i
