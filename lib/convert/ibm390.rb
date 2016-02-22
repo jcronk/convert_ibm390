@@ -148,21 +148,26 @@ module Convert
     # end
 
     def num2ascnum(num, ndec=0)
-      num = eb2asc(num).to_i
+      ascnum2num(eb2asc(num))
+    end
+
+    def ascnum2num(num, ndec=0)
+      num = num.to_i
       add_decimals(num, ndec)
     end
 
     def asc_zoned2num(zoned, ndec=0)
+      sign = asc_zoned_sign(zoned)
       zoned = zoned.tr(' {ABCDEFGHI}JKLMNOPQR', '001234567890123456789').strip
       raise ConversionError, "Invalid zoned value '#{zoned}' (#{zoned.unpack('H*').map{|c| "x#{c}"}.join})" unless zoned =~ /^\d+/
-      final = zoned.to_i
+      final = zoned.to_i * sign
       add_decimals(final, ndec)
     end
 
     # Convert a zoned decimal that has been re-encoded to
     # ASCII from EBCDIC into a number with the correct sign
     def asc_zoned_sign(zoned)
-      zoned =~ /[J-R]$/ ? -1 : 1
+      zoned =~ /[}J-R]$/ ? -1 : 1
     end
 
     # convert packed fullword to number
