@@ -53,7 +53,10 @@ guard :minitest do
   # watch(%r{^app/models/(.*)\.rb$})      { |m| "test/unit/#{m[1]}_test.rb" }
 end
 
-guard 'yard' do
+port = 3000
+port += 1 while system("lsof -i:#{port}")
+
+guard 'yard', port: port do
   watch(%r{app/.+\.rb})
   watch(%r{lib/.+\.rb})
   watch(%r{ext/.+\.c})
