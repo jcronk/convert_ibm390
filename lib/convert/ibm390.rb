@@ -10,6 +10,9 @@ module Convert
   # :reek:FeatureEnvy
   # :reek:UncommunicativeModuleName
   module IBM390
+    class << self
+      include Convert::IBM390
+    end
     ConversionError = Class.new(StandardError)
 
     AE_HEX_TABLE = '00010203372d2e2f1605150b0c0d0e0f101112133c3d322618193f271c1d1e1f'\
