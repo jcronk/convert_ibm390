@@ -1,14 +1,13 @@
+# frozen_string_literal: false
+
 require 'convert/ibm390/version'
 # Functions for converting EBCDIC to ASCII and unpacking COMP, COMP-3,
 # and zoned fields.
 # A partial port to Ruby of the Perl module {https://metacpan.org/pod/Convert::IBM390 Convert::IBM390} by Geoffrey Rommel
 # @author Jeremy Cronk
 module Convert
-
-
   module IBM390
-
-    class ConversionError < Exception ; end
+    ConversionError = Class.new(StandardError)
 
     AE_HEX_TABLE = '00010203372d2e2f1605150b0c0d0e0f101112133c3d322618193f271c1d1e1f'\
       '405a7f7b5b6c507d4d5d5c4e6b604b61f0f1f2f3f4f5f6f7f8f97a5e4c7e6e6f'\
