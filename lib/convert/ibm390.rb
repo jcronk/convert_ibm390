@@ -109,56 +109,6 @@ module Convert
       raise e, "Error converting EBCDIC string '#{zoned}' (#{zoned.size} chars) into number.  Hex of original string: #{hexify(zoned)}\n#{e.message}"
     end
 
-    def hexify(string)
-      string.unpack('H*').first.split(//).each_slice(2).to_a.map do |chrs|
-        chrs.join('').to_s
-      end.join(' ')
-    end
-
-    def hexdump(string, startad = 0, charset = 'ascii')
-      range = 0..string.length
-      outlines = []
-      range.step(32) do |offset|
-        substr = string[offset...offset + 32]
-        printstr = if charset =~ /ebc/i
-                     eb2ascp(substr)
-                   else
-                     substr.encode('UTF-8', invalid: :replace, replace: ' ').tr(
-                       "\000-\037\377",
-                       ' '
-                     )
-              end
-        hexes = substr.unpack('H64').first
-        hexes = hexes.tr('a-f', 'A-F')
-        if (string.length - offset) < 32
-          printstr = [printstr].pack('A32')
-          hexes = [hexes].pack('A64')
-        end
-        line = format('%06X: ', (startad + offset))
-        (0..64).step(8) do |nbr|
-          line << hexes[nbr...nbr + 8] << ' '
-          line << ' ' if nbr == 24
-        end
-        line << " *#{printstr}*\n"
-        outlines << line
-      end
-      outlines
-    end
-
-    # def unpackeb(template, record)
-    #   pointer_pos = 0
-    #   template_pos =
-    # end
-
-    def num2ascnum(num, _ndec = 0)
-      ascnum2num(eb2asc(num))
-    end
-
-    def ascnum2num(num, ndec = 0)
-      num = num.to_i
-      add_decimals(num, ndec)
-    end
-
     def asc_zoned2num(zoned, ndec = 0)
       sign = asc_zoned_sign(zoned)
       zoned = zoned.tr(' {ABCDEFGHI}JKLMNOPQR', '001234567890123456789').strip
@@ -168,6 +118,29 @@ module Convert
       add_decimals(final, ndec)
     end
 
+    # Create a hex string for error messages
+    def hexify(string)
+      string.unpack1('H*').split(//).each_slice(2).to_a.map do |chrs|
+        chrs.join('').to_s
+      end.join(' ')
+    end
+
+    # EBCDIC numeric to ASCII numeric with implied decimals applied
+    # @param num [String] an EBCDIC-encoded numeric string
+    # @param ndec [Integer] (0) the number of implied decimals
+    # @return [Numeric] Either a float or an Integer depending on implied decimals
+    def num2ascnum(num, ndec = 0)
+      ascnum2num(eb2asc(num), ndec)
+    end
+
+    # ASCII numeric to numeric with implied decimals applied
+    # @param num [String] an ASCII-encoded numeric string
+    # @param ndec [Integer] (0) the number of implied decimals
+    # @return [Numeric] Either a float or an Integer depending on implied decimals
+    def ascnum2num(num, ndec = 0)
+      num = num.to_i
+      add_decimals(num, ndec)
+    end
 
     # convert packed fullword to number
     def fullwd2num(int)
