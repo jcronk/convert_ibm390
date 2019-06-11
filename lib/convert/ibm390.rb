@@ -81,24 +81,13 @@ module Convert
     # @return [Integer] if no implied decimals
     # @return [Float] if implied decimals
     def packed2num(packed, ndec = 0)
-      w = packed.length * 2
-      xdigits = packed.unpack("H#{w}").first.split(//)
-      sign = xdigits.pop # last character
-      arabic = xdigits.join # rest of characters
-      if arabic !~ /^\d+$/ || sign !~ /^[a-f]$/
-        raise ConversionError, "Invalid packed value '#{xdigits.join('').upcase}'"
-      end
+      xdigits = packed_as_hex_array(packed)
+      arabic, sign = ->(*h, t) { [h.join(''), t] }.call(*xdigits)
+      raise ConversionError, "Invalid packed value '#{xdigits.join('').upcase}'" unless assert_packed_numeric(arabic, sign)
 
       arabic = arabic.to_i
       arabic = 0 - arabic if sign =~ /[bd]/
       add_decimals(arabic, ndec)
-    end
-
-    # Apply implied decimals to an integer
-    def add_decimals(value, ndec = 0)
-      return value if ndec.zero?
-
-      value /= 10.0**ndec
     end
 
     # Translate EBCDIC to ASCII (printable characters only)
@@ -179,11 +168,6 @@ module Convert
       add_decimals(final, ndec)
     end
 
-    # Convert a zoned decimal that has been re-encoded to
-    # ASCII from EBCDIC into a number with the correct sign
-    def asc_zoned_sign(zoned)
-      zoned =~ /[}J-R]$/ ? -1 : 1
-    end
 
     # convert packed fullword to number
     def fullwd2num(int)
@@ -199,5 +183,30 @@ module Convert
       byt = int.unpack('cC')
       256 * byt[0] + byt[1]
     end
+
+    private
+
+    def assert_packed_numeric(arabic, sign)
+      arabic =~ /^\d+$/ && sign =~ /^[a-f]$/
+    end
+
+    def packed_as_hex_array(packed)
+      width = packed.length * 2
+      packed.unpack1("H#{width}").split(//)
+    end
+
+    # Apply implied decimals to an integer
+    def add_decimals(value, ndec = 0)
+      return value if ndec.zero?
+
+      value / 10.0**ndec
+    end
+
+    # Convert a zoned decimal that has been re-encoded to
+    # ASCII from EBCDIC into a number with the correct sign
+    def asc_zoned_sign(zoned)
+      /[}J-R]$/.match?(zoned) ? -1 : 1
+    end
+
   end
 end
