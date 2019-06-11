@@ -2,7 +2,6 @@
 
 require 'minitest/autorun'
 require 'test_helper'
-require 'convert/ibm390'
 
 module Convert
   class IBM390Test < Minitest::Test

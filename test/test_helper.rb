@@ -6,6 +6,8 @@ require 'minitest/byebug'
 require 'shoulda/context'
 require 'pathname'
 
+require 'convert/ibm390'
+
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 THISDIR = Pathname.new(__dir__).realpath
