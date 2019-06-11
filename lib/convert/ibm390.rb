@@ -114,9 +114,8 @@ module Convert
     # @return [Integer] if no implied decimals
     # @return [Float] if implied decimals
     def zoned2num(zoned, ndec = 0)
-      sign = (zoned =~ /[\xD0-\xD9]/n ? -1 : 1)
       asc_zoned = eb2asc(zoned)
-      sign * asc_zoned2num(asc_zoned, ndec)
+      asc_zoned2num(asc_zoned, ndec)
     rescue ConversionError => e
       raise e, "Error converting EBCDIC string '#{zoned}' (#{zoned.size} chars) into number.  Hex of original string: #{hexify(zoned)}\n#{e.message}"
     end
