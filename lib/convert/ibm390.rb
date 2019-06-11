@@ -97,11 +97,10 @@ module Convert
       fcs_xlate(string, E2AP_TABLE)
     end
 
-    # Translate a zoned value to ASCII
-    # @param [String] the value
-    # @param [Integer] The number of implied decimals
-    # @return [Integer] if no implied decimals
-    # @return [Float] if implied decimals
+    # Translate a zoned value to numeric
+    # @param zoned [String] the value
+    # @param ndec [Integer] (0) the number of implied decimals
+    # @return [Numeric] class depends on whether there are implied decimals
     def zoned2num(zoned, ndec = 0)
       asc_zoned = eb2asc(zoned)
       asc_zoned2num(asc_zoned, ndec)
@@ -109,6 +108,10 @@ module Convert
       raise e, "Error converting EBCDIC string '#{zoned}' (#{zoned.size} chars) into number.  Hex of original string: #{hexify(zoned)}\n#{e.message}"
     end
 
+    # Translate a zoned value to numeric
+    # @param zoned [String] the value
+    # @param ndec [Integer] (0) The number of implied decimals
+    # @return [Numeric] class depends on whether there are implied decimals
     def asc_zoned2num(zoned, ndec = 0)
       sign = asc_zoned_sign(zoned)
       zoned = zoned.tr(' {ABCDEFGHI}JKLMNOPQR', '001234567890123456789').strip
